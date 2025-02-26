@@ -1,0 +1,52 @@
+\section{Vandermonde matrix}
+
+This section describes the interpolation of a given set of 20 datapoints $(x,y)$, 
+and compares the difference between various numbers of iteration as well as Neville's algotrithm.
+
+
+The calculations use the following module:
+\lstinputlisting{interpolator.py}
+
+The calculations themselves are called in this script:
+\lstinputlisting{question2.py}
+
+The resulting LU matrix is:
+\lstinputlisting{question2_output.txt}
+
+\begin{figure}[h!]\label{fig:figure_q2}
+  \centering
+  \includegraphics[width=0.9\linewidth]{./plots/question2c.png}
+  \caption{Upper panel: the interpolated polynomials plotted over the datapoints. Only the result for a single LU decomposition (solid, orange) visibly differs from the rest. \\
+  Lower panel: the absolute difference between each interpolated polynomial and the datapoints. The result from Neville's algorithm is the most accurate by far.
+  }
+  \label{fig:fig1}
+\end{figure}
+
+\subsection{LU decomposition (question 2a)}\label{section:question_2a}
+The interpolated polynomial (the solid orange line in Figure \ref{fig:figure_q2}) goes through the given data points nicely.
+The error lies around $10^{-1}$ for all points except the first.
+
+\subsection{Lagrange polynomial (question 2b)}
+The interpolated polynomial (the green dashed line in Figure \ref{fig:figure_q2}) goes through the given data points nicely, though the interpolated part between the first and second point differs from the result from \ref{section:question_2a} (solid orange).
+The error lies around $10^{-14}$ for most points, but is 0 for some.
+This is a drastic difference compared to the result from \ref{section:question_2a}.
+This high accuracy makes sense: while LU decomposition calculates the entire polynomial first and finds the estimated value at the datapoints from there, Neville's algorithm computes the expected value at the individual datapoint directly.
+
+
+\subsection{LU iterations (question 2c)}
+The greatest improvement is seen in the lower half of $x$ values (error around $10^{-3}$ for 1 iteration, $10^{-5}$ for 10 iterations), for higher $x$ the error approaches that of the uniterated interpolation.
+
+
+\subsection{Runtimes (question 2d)}
+To isolate the runtimes of each method, put them each in a function, and call that with \texttt{timeit}:
+\lstinputlisting{question2d.py}
+
+The runtimes for the three different methods are:
+\lstinputlisting{question2d_output.txt}
+
+LU decomposition is the fastest.
+We also see the cost of the high accuracy of Neville's algorithm: a runtime around ten times as long.
+The great advantage of iterating the LU method also shows: because the LU matrix only has to be computed once, the improvement in accuracy (by several orders of magnitude) requires very little extra runtime.
+
+
+

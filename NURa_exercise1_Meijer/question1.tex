@@ -1,0 +1,80 @@
+\section{Poisson distribution}
+
+The goal of this section is to write a function for the Poisson probability distribution
+\begin{equation}
+P_\lambda(k) = \frac{\lambda^k e^{-\lambda}}{k!},
+\end{equation}
+that is accurate to 6 significant digits,
+while only using 32-bit \texttt{numpy} datatypes.
+
+Calculating the entire factorial $k!$ produces overflow for $k > 12$. 
+This can be solved by changing the equation into a logarithm:
+\begin{equation}
+\begin{split}
+\ln(P_\lambda(k)) & = k \cdot \ln(\lambda) - \lambda - \ln(k!) \\
+& = k \cdot \ln(\lambda) - \lambda - \sum^{k}_{i=1} \ln(i)
+\end{split}
+\end{equation}
+and returning $\exp(\ln(P_\lambda(k)))$.
+
+
+To check the accuracy of our approximation, compare with the value given by \texttt{scipy.stats.poisson.ppf()}.
+%The function \texttt{numpy.frexp()} decomposes a float into its fraction and its exponent. 
+By looking at the difference between of our value and the fraction of \texttt{scipy}'s value, we can see from which digit they start to differ.
+An example is given in Figure \ref{fig:question_1}, for $(\lambda,k)=(101,200)$.
+
+%For $(\lambda,k) = (1,0), (5,10), (3,21)$ this works well enough.
+%, with the fractional error staying well between the boundary of $\pm10^{-6}$.
+%However, for $(\lambda,k) = (100,5), (101,200)$ the absolute fractional error is greater than $10^{-6}$, 
+%and while $(\lambda,k) = (2.6,40)$ is within the tolerance, the fractional error increases for higher $k$.
+
+\begin{figure}[h!]\label{fig:question_1}
+  \centering
+  \includegraphics[width=0.9\linewidth]{./plots/question1_101.png}
+  \caption{
+  Upper panel: Poisson distribution for $(\lambda,k) = (101,200)$. \\
+  Lower panel: the fractional difference between the result from \texttt{Poisson\_distr()} and \texttt{scipy.stats.poisson.ppf()}.
+  The horizontal grey lines indicate $\pm 10^{-5}$.
+  If the reservoir trick isn't used (black line), the error jumps quite dramatically for $k>128$. When using the reservoir trick with a threshold of 32 (blue line), the error stays more constant.
+  The vertical dashed line indicates $k$. 
+  }
+  \label{fig:fig1}
+\end{figure}
+
+If $k$ becomes greater than $128$, the error jumps quite dramatically.
+This can be attributed to underflow.
+For example, for $k=37$,
+\begin{equation}
+\begin{split}
+\ln(37!) = \sum^{37}_{i=1} \ln(i) = \mathtt{99.33061}.
+\end{split}
+\end{equation}
+However, if $k=38$, the extra $\mathtt{3.637586}$ gives us a total with 3 digits before the decimal point,
+but the number of available significant digits stays the same, so we lose the information from the last digit:
+\begin{equation}
+\begin{split}
+\ln(38!) = \ln(37!) + \ln(38) = \mathtt{102.9682},
+\end{split}
+\end{equation}
+If we can make sure the running total never exceeds 100, we don't lose the information beyond the fifth decimal.
+%37.0 99.33061 3.610918
+%38.0 102.9682 3.637586
+
+This is accomplished by putting the $k \cdot \ln(\lambda)$ term in a `reservoir',  and when the running total is about to exceed a set threshold, adding $k_\mathrm{step} \cdot \ln(\lambda)$ to it (and reducing the reservoir accordingly).
+
+While the example above uses base 10, of course a computer uses base 2, 
+so when choosing a suitable threshold, it makes sense to try powers of 2. 
+Down to 64, each power of 2 performs better than the one above.
+For thresholds below 16, the accumulation of machine error starts to worsen our results.
+There is no apparent difference between the results of thresholds 16, 32 and 64, so choose 32 as the middle ground.
+
+
+
+
+
+All this is implemented in the following script:
+\lstinputlisting{question1.py}
+
+Output:
+\lstinputlisting{question1_output.txt}
+
