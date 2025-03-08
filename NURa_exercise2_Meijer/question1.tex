@@ -1,0 +1,185 @@
+\section{Satellite galaxies around a massive central}
+
+\subsection{Computing $A$}
+%# Write a numerical integrator based on some form of Richardson extrapolation to 
+%# solve equation (2) for A given those four parameters. Output A to full precision.
+%# Hint: First think about what dV is for a spherical integral!
+
+\begin{equation}\label{eqn:one}
+n(x) = A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
+\exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
+\end{equation}
+
+For a spherical integral, $\mathrm{d}V = x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi$. When integrating over a full sphere, this simplifies to $4\pi x^2 \,\mathrm{d}x$
+
+\begin{equation}
+\begin{split}
+\langle N_{sat} \rangle & = \int\int\int_V n(x) \,\mathrm{d}V \\
+& = \int_0^{2\pi} \int_0^\pi \int_{x=0}^{x=5} n(x) x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi \\
+& = 4\pi \int_{x=0}^{x=5} n(x) x^2 \,\mathrm{d}x
+\end{split}
+\end{equation}
+
+
+Filling in \ref{eqn:one},
+\begin{equation}
+\begin{split}
+\frac1A & = 4\pi \int_{x=0}^{x=5} 
+\left( \frac{x}{b} \right)^{a-3}
+\exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
+x^2 \,\mathrm{d}x
+\end{split}
+\end{equation}
+
+The computed value of $A$ is:
+\lstinputlisting{question1a_output.txt}
+
+\subsection{[ding met rng]}
+%# We want to generate 3D satellite positions such that they statistically 
+%# follow the satellite profile in equation (1); 
+%# that is, the probability distribution of the (relative)
+%# radii x in [0, 5) should be p(x) dx = N (x) dx/ hN sat i.
+%# Use one of the methods discussed in class to sample this distribution.
+
+
+[[[ transformation kan niet zomaar want N(x) is niet invertible ]]]
+
+$N(x)\mathrm{d}x$ is the number of galaxies in range $[x,x+\mathrm{d}x)$.
+
+The number of galaxies in range $[x,x+\mathrm{d}x)$ is
+\begin{equation}
+\begin{split}
+N(x) \mathrm{d}x & = 4\pi \int_{x}^{x+\mathrm{d}x} x^2 n(x) \,\mathrm{d}x
+\end{split}
+\end{equation}
+so 
+\begin{equation}
+\begin{split}
+N(x) & = 4\pi x^2 n(x)
+\end{split}
+\end{equation}
+
+
+
+\begin{figure}[h!]\label{fig:question1b}
+  \centering
+  \includegraphics[width=0.9\linewidth]{./plots/question1b.png}
+  \caption{
+  [[[caption]]]
+  }
+\end{figure}
+
+
+
+\subsection{[selecting galaxies]}
+%#Select 100 random satellite galaxies from (b) in a way that is guaranteed to:
+%# 1. select every galaxy with equal probability;
+%# 2. not draw the same galaxy twice;
+%# 3. not reject any draw.
+%# Next sort the 100 drawn galaxies from smallest to largest radius
+%# plot the number of galaxies within a radius, use a xlog plot from x = 10 -4 to x = x max .
+
+\begin{figure}[h!]\label{fig:question1c}
+  \centering
+  \includegraphics[width=0.9\linewidth]{./plots/question1c.png}
+  \caption{
+  [[[caption]]]
+  }
+\end{figure}
+
+\subsection{[derivative]}
+%# Numerically calculate dn(x)/dx at x = 1.
+%# Output the value found alongside the analytical result, both to at least 12 significant digits. 
+%# Choose your differentiation algorithm such that these are as close as possible.
+
+\begin{equation}
+\begin{split}
+n(x) & = A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
+\exp{\left[ -\left(\frac{x}{b}\right)^c \right]} \\
+& = A \langle N_{sat} \rangle 
+f(x) g(x)
+\end{split}
+\end{equation}
+
+
+\begin{equation}
+\begin{split}
+\frac{\mathrm{d}n(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x} A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
+\exp{\left[ -\left(\frac{x}{b}\right)^c \right]} \\
+& = \frac{\mathrm{d}}{\mathrm{d}x} A \langle N_{sat} \rangle 
+f(x) g(x) \\
+& = A \langle N_{sat} \rangle 
+\left( \frac{\mathrm{d}f(x)}{\mathrm{d}x} g(x) + f(x) \frac{\mathrm{d}g(x)}{\mathrm{d}x} \right)
+ \\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+\frac{\mathrm{d}f(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x}  \left( \frac{x}{b} \right)^{a-3} \\
+& = b^{3-a} (a-3) x^{a-4} \\
+& = (a-3) \left( \frac{x}{b} \right)^{a-3} x^{-1} \\
+& = f(x) (a-3) x^{-1}
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+\frac{\mathrm{d}g(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x} 
+\exp{\left[ -\left(\frac{x}{b}\right)^c \right]} \\
+& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot \frac{\mathrm{d}}{\mathrm{d}x} 
+\left[ -\left(\frac{x}{b}\right)^c \right] \\
+& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot 
+-b^{-c} c x^{c-1} \\
+& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot 
+- \left(\frac{x}{b}\right)^c  c x^{-1} \\
+& = g(x)  \cdot 
+- \left(\frac{x}{b}\right)^c  c x^{-1} \\
+\end{split}
+\end{equation}
+
+Combine into product rule:
+\begin{equation}
+\begin{split}
+\frac{\mathrm{d}f(x)}{\mathrm{d}x} g(x) + f(x) \frac{\mathrm{d}g(x)}{\mathrm{d}x} 
+& = 
+f(x) g(x) (a-3) x^{-1} 
++ 
+f(x) g(x)  \cdot - \left(\frac{x}{b}\right)^c  c x^{-1} \\
+& =
+f(x) g(x)
+\left[
+(a-3) x^{-1}
+- \left(\frac{x}{b}\right)^c  c x^{-1}
+\right] \\
+& =
+f(x) g(x)
+\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1}
+\\
+\end{split}
+\end{equation}
+
+
+
+So
+\begin{equation}
+\begin{split}
+\frac{\mathrm{d}n(x)}{\mathrm{d}x} & = 
+A \langle N_{sat} \rangle
+f(x) g(x)
+\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1} \\
+& = n(x)
+\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1}
+\end{split}
+\end{equation}
+
+
+Output:
+\lstinputlisting{question1d_output.txt}
+
+
+\newpage
+All this is implemented in the following script:
+\lstinputlisting{question1.py}
+
+
