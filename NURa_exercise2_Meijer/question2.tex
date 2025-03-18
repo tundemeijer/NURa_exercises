@@ -1,0 +1,108 @@
+\section{Heating and cooling in HII regions}
+
+\subsection{[part1]}
+
+photoionization
+\begin{equation}\label{eqn:heating}
+\Gamma_\mathrm{pe} = \alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} \psi k_\mathrm{B} T_\mathrm{c}
+\end{equation}
+
+
+radiative recombination
+\begin{equation}\label{eqn:cooling}
+\Lambda_\mathrm{rr} = \alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} \langle E_\mathrm{rr} \rangle
+\end{equation}
+
+
+
+\begin{equation}
+\begin{split}
+\Gamma_\mathrm{pe} - \Lambda_\mathrm{rr} &= \psi k_\mathrm{B} T_\mathrm{c} - \langle E_\mathrm{rr} \rangle \\
+&= \psi T_\mathrm{c} - \left[ 0.684 - 0.0416 \ln\left(\frac{T_4}{Z^2}\right) \right] T \\
+&= 0
+\end{split}
+\end{equation}
+
+[find the T where this is true]
+
+
+Analytical result
+\begin{equation}
+\begin{split}
+\psi k_\mathrm{B} T_\mathrm{c} - \left[ 0.684 - 0.0416 \ln(\frac{T_4}{Z^2}) \right] k_\mathrm{B}T &= 0 
+\\
+\left[ 0.684 - 0.0416 \ln(\frac{T_4}{Z^2}) \right] T &= \psi T_\mathrm{c} 
+\\
+\left[ 0.684 - 0.0416 \ln(\frac{T_4}{Z^2}) \right] &= \frac{\psi T_\mathrm{c}}{T}
+\\
+\ln(\frac{T_4}{Z^2}) &= \left[ 0.684 - \frac{\psi T_\mathrm{c}}{T} \right] \frac1{0.0416}
+\\
+\end{split}
+\end{equation}
+
+%\lstinputlisting{question2a_output.txt}
+
+\subsection{[part2]}
+
+\begin{equation}\label{eqn:heating}
+\Gamma_\mathrm{CR} = 0.54 T_4^{0.37} \alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} k_\mathrm{B} T
+\end{equation}
+
+\begin{equation}\label{eqn:cooling}
+\Lambda_\mathrm{CR} = A n_\mathrm{e} \xi_\mathrm{CR}
+\end{equation}
+
+\begin{equation}\label{eqn:cooling}
+\Lambda_\mathrm{MHD} = 8.9\cdot10^{-26} n_\mathrm{H} T_4
+\end{equation}
+
+[full thing] [assume ne=nH]
+\begin{equation}
+\begin{split}
+(\Gamma_\mathrm{pe} + \Gamma_\mathrm{CR})
+-
+(\Lambda_\mathrm{rr} + \Lambda_\mathrm{CR} + \Lambda_\mathrm{MHD})
+&= 
+(\alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} \psi k_\mathrm{B} T_\mathrm{c}
++ 0.54 T_4^{0.37} \alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} k_\mathrm{B} T) \\
+& - 
+(\alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{e} \langle E_\mathrm{rr} \rangle
++ A n_\mathrm{e} \xi_\mathrm{CR} + 8.9\cdot10^{-26} n_\mathrm{H} T_4) 
+\\
+&=
+\\
+&=
+(\alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{H} \psi k_\mathrm{B} T_\mathrm{c}
++ 0.54 T_4^{0.37} \alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{H} k_\mathrm{B} T) \\
+& - 
+(\alpha_\mathrm{B} n_\mathrm{H} n_\mathrm{H} \langle E_\mathrm{rr} \rangle
++ A n_\mathrm{H} \xi_\mathrm{CR} + 8.9\cdot10^{-26} n_\mathrm{H} T_4 ) 
+\\
+&= 0
+\\
+& =
+(\alpha_\mathrm{B} n_\mathrm{H} \psi k_\mathrm{B} T_\mathrm{c}
++ 0.54 T_4^{0.37} \alpha_\mathrm{B} n_\mathrm{H} k_\mathrm{B} T) \\
+& - 
+\alpha_\mathrm{B} n_\mathrm{H} \langle E_\mathrm{rr} \rangle
+- A \xi_\mathrm{CR} - 8.9\cdot10^{-26} T_4
+\\
+&=
+\\
+& =
+\alpha_\mathrm{B} n_\mathrm{H} 
+(\psi k_\mathrm{B} T_\mathrm{c}
++ 0.54 T_4^{0.37} k_\mathrm{B} T
+ -  \langle E_\mathrm{rr} \rangle) \\
+& - A \xi_\mathrm{CR} - 8.9\cdot10^{-26} T_4
+\\
+&= 0
+\end{split}
+\end{equation}
+
+
+%\newpage
+%All this is implemented in the following script:
+%\lstinputlisting{question2.py}
+
+

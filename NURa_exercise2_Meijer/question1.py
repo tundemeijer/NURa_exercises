@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(1)
+np.random.seed(1) # !!!
 N_generate = 10000
 
 A=1. # to be computed
@@ -17,10 +17,7 @@ def n(x,A,Nsat,a,b,c):
 output1a = open("question1a_output.txt","w")
 
 xmin, xmax = 10**-4, 5
-xdata = np.linspace(xmin,xmax,100)
 
-# Write a numerical integrator based on some form of Richardson extrapolation to 
-# solve equation (2) for A given those four parameters. Output A to full precision.
 def integration_Romberg(func,a,b,m):
     '''
     Integrate the function func from a to b, at order m
@@ -49,34 +46,27 @@ def integration_Romberg(func,a,b,m):
     return r[0]
 
 # Test whether the integration function makes sense
-func = lambda x: x**2
-int_func = lambda x: 1/3 * x**3
+#func = lambda x: x**2
+#int_func = lambda x: 1/3 * x**3
 #print("Analytical:",int_func(3)-int_func(1))
 #print("Romberg   :",integration_Romberg(func,1,3,m=3))
 
-
-def integreer(x):
-    # !!! kies welke van deze twee formuleringen mooier is
-    return 4*np.pi * x**2 * ((x/b)**(a-3))*np.exp(-(x/b)**c) * A
-    return 4*np.pi * x**2 * n(x) / Nsat
-
-
-A = 1/integration_Romberg(integreer
+A = 1/integration_Romberg(lambda x: 4*np.pi * x**2 * n(x,A,Nsat,a,b,c) / Nsat
                           ,xmin,xmax,m=10)
-print(A)
 output1a.write("A: "+str(A))
 
 
-ydata = n(xdata,A,Nsat,a,b,c)
-plt.loglog(xdata,ydata)
-plt.xlabel("x")
-plt.ylabel("n(x)")
-plt.title("n(x)")
-plt.show()
+xdata = np.linspace(xmin,xmax,100)
+#ydata = n(xdata,A,Nsat,a,b,c)
+#plt.loglog(xdata,ydata)
+#plt.xlabel("x")
+#plt.ylabel("n(x)")
+#plt.title("n(x)")
+#plt.show()
 
 # Test of A consistent is, dit zou Nsat=100 moeten zijn:
-print(integration_Romberg(lambda x: 4*np.pi *x**2 * n(x,A,Nsat,a,b,c),
-                          xmin,xmax,m=10))
+#print(integration_Romberg(lambda x: 4*np.pi *x**2 * n(x,A,Nsat,a,b,c),
+#                          xmin,xmax,m=10))
 
 output1a.close()
 
@@ -103,23 +93,27 @@ def random_uniform(low=0.0, high=1.0, size=None):
 
 def rejectionsample(func,N=1,a=0,b=1):
     '''
-    Draw N points from function func, between a and b
+    Draw N points from function func(x), between x=a and x=b
     '''
-    #fig,ax = plt.subplots()
+    #fig,ax = plt.subplots() # !!!
+    
+    # Find the height of func
+    xdata = np.linspace(xmin,xmax,100)
     ydata = func(xdata)
-    maxy = max(ydata)
-    #ax.plot(xdata,ydata)
+    maxy = max(ydata)*1.1 # Safety margin of 10%
+    
+    #ax.plot(xdata,ydata) # !!!
     drawn = []
     while len(drawn)<N:
         xdraw = random_uniform() * (b-a) + a
         ydraw = random_uniform() * maxy
-        #col = 'k'
+        #col = 'k' # !!!
         if func(xdraw)>ydraw:
             drawn.append(xdraw)
-            #col = 'r'
+            #col = 'r' # !!!
             
-        #ax.plot(xdraw,ydraw,'.',color=col)
-    #plt.show()
+        #ax.plot(xdraw,ydraw,'.',color=col) # !!!
+    #plt.show() # !!!
     return np.array(drawn)
 
 '''
@@ -143,7 +137,7 @@ plt.hist(edges[:-1], edges, weights=hist_scaled,edgecolor='k')
 plt.show()
 '''
 
-#%
+#%%
 
 #Plot of histogram in log-log space with line (question 1b)
 xmin, xmax = 10**-4, 5
@@ -159,13 +153,12 @@ for i in range(len(bin_widths)):
     bin_widths[i] = edges[i+1]-edges[i]
 hist_scaled = hist/bin_widths/N_generate # divide every bin by its width, correct for N_generate
 
-relative_radius = np.linspace(xmin,xmax,100)#edges.copy() #replace!
+relative_radius = np.linspace(xmin,xmax,100)
 analytical_function = N(relative_radius)/Nsat # correct for Nsat
 
 fig1b, ax = plt.subplots()
-ax.stairs(hist_scaled, edges=edges, edgecolor='k', fill=True, label='Satellite galaxies') #just an example line, correct this!
-#ax.plot(edges[:-1], hist_scaled,'.')
-plt.plot(relative_radius, analytical_function, 'r-', label='Analytical solution') #correct this according to the exercise!
+ax.stairs(hist_scaled, edges=edges, edgecolor='k', fill=True, label='Sampled satellite galaxies')
+plt.plot(relative_radius, analytical_function, 'r-', label='Analytical solution')
 ax.set(xlim=(xmin, xmax), ylim=(10**(-3), 10), 
        yscale='log', xscale='log',
        xlabel='Relative radius', ylabel='Number of galaxies')

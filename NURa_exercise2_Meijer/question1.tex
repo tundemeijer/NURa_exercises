@@ -4,33 +4,31 @@
 %# Write a numerical integrator based on some form of Richardson extrapolation to 
 %# solve equation (2) for A given those four parameters. Output A to full precision.
 %# Hint: First think about what dV is for a spherical integral!
-
+We are given the number density profile
 \begin{equation}\label{eqn:one}
 n(x) = A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
 \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
 \end{equation}
+with $a = 2.4$, $b = 0.25$, $c = 1.6$, $x_\mathrm{max} = 5$ and $\langle N_\mathrm{sat}\rangle = 100$, and we want to know $A$.
 
-For a spherical integral, $\mathrm{d}V = x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi$. When integrating over a full sphere, this simplifies to $4\pi x^2 \,\mathrm{d}x$
-
-\begin{equation}
+For a spherical integral, $\mathrm{d}V = x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi$. When integrating over a full sphere, this simplifies to $4\pi x^2 \,\mathrm{d}x$, so
+\begin{equation}\label{eqn:two}
 \begin{split}
 \langle N_{sat} \rangle & = \int\int\int_V n(x) \,\mathrm{d}V \\
-& = \int_0^{2\pi} \int_0^\pi \int_{x=0}^{x=5} n(x) x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi \\
-& = 4\pi \int_{x=0}^{x=5} n(x) x^2 \,\mathrm{d}x
+& = 4\pi \int_{x=0}^{x=5} n(x) x^2 \,\mathrm{d}x.
 \end{split}
 \end{equation}
-
-
-Filling in \ref{eqn:one},
+Combining Equation \ref{eqn:one} and Equation \ref{eqn:two}, the equation to integrate becomes:
 \begin{equation}
 \begin{split}
-\frac1A & = 4\pi \int_{x=0}^{x=5} 
+\frac1A 
+& = 4\pi \int_{x=0}^{x=5}  \frac{n(x)}{A \langle N_{sat} \rangle} x^2 \,\mathrm{d}x \\
+& = 4\pi \int_{x=0}^{x=5} 
 \left( \frac{x}{b} \right)^{a-3}
 \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
-x^2 \,\mathrm{d}x
+x^2 \,\mathrm{d}x.
 \end{split}
 \end{equation}
-
 The computed value of $A$ is:
 \lstinputlisting{question1a_output.txt}
 
@@ -41,10 +39,13 @@ The computed value of $A$ is:
 %# radii x in [0, 5) should be p(x) dx = N (x) dx/ hN sat i.
 %# Use one of the methods discussed in class to sample this distribution.
 
+[[generate 3D satellite positions such that they statistically follow the satellite profile in equation (1); that is, the probability distribution of the (relative) radii in $x \in [0,5)$ should be p(x) dx = N (x) dx/ hN sat i.]]
 
-[[[ transformation kan niet zomaar want N(x) is niet invertible ]]]
+$x \in [0,5)$
 
-$N(x)\mathrm{d}x$ is the number of galaxies in range $[x,x+\mathrm{d}x)$.
+$p(x) \mathrm{d}x = N(x) \mathrm{d}x / \langle N_\mathrm{sat} \rangle$
+
+%$N(x)\mathrm{d}x$ is the number of galaxies in range $[x,x+\mathrm{d}x)$.
 
 The number of galaxies in range $[x,x+\mathrm{d}x)$ is
 \begin{equation}
@@ -59,7 +60,17 @@ N(x) & = 4\pi x^2 n(x)
 \end{split}
 \end{equation}
 
+the distribution to sample from is
+\begin{equation}
+\begin{split}
+p(x) \mathrm{d}x &= 4\pi x^2 n(x) / \langle N_\mathrm{sat} \rangle
+\end{split}
+\end{equation}
 
+%[[[ transformation kan niet zomaar want N(x) is niet invertible ]]]
+[[use rejection sampling]]
+
+[[iets over de rng]][[test randomness of rng]]
 
 \begin{figure}[h!]\label{fig:question1b}
   \centering
