@@ -8,22 +8,30 @@ if [ ! -d "plots" ]; then
 fi
 rm -rf plots/*
 
-#echo "Download points for Vandermonde matrix ..."
-#if [ ! -e Vandermonde.txt ]; then
-#  wget https://home.strw.leidenuniv.nl/~daalen/Handin_files/Vandermonde.txt
-#fi
-
 # Script for question 1
 echo "Run question 1 ..."
 python3 question1.py
 
-# Script for question 2
-#echo "Run question 2 ..."
-#python3 question2.py
+# Scripts for question 1
+echo "Run randomnumbergenerator ... (ignore warning about overflow)"
+python3 randomnumbergenerator.py
+echo "Run question 1 ..."
+python3 question1.py
+echo "Run question 1a ..."
+python3 question1a.py
+echo "Run question 1b ... (ignore warning about overflow)"
+python3 question1b.py
+echo "Run question 1c ... (ignore warning about overflow)"
+python3 question1c.py
+echo "Run question 1d ..."
+python3 question1d.py
 
-# Script for question 2d
-#echo "Run question 2d ..."
-#python3 question2d.py
+
+# Scripts for question 2
+echo "Run question 2a ..."
+python3 question2a.py
+echo "Run question 2b ..."
+python3 question2b.py
 
 echo "Generating the pdf"
 

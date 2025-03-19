@@ -1,24 +1,43 @@
 \section{Satellite galaxies around a massive central}
 
-\subsection{Computing $A$}
+All four subquestions use the same function \texttt{n} and values for \texttt{Nsat}, \texttt{a}, \texttt{b} and \texttt{c}:
+\lstinputlisting{question1.py}
+
+Questions 1b and 1c use the random number generator below. It uses a 64-bit XOR-shift with $a_1=21$, $a_2=35$ and $a_3=4$, then an MLCG with $a=2685821657736338717$ and $m=2^{64}$. Because we are working with 64-bit integers, the $\mod m$ happens automatically. It does mean that the code gives a warning about overflow, which we can ignore. 
+
+I didn't have enough time to write a proper test of its randomness, but Figure \ref{fig:rngtest} shows that large numbers of drawn points are evenly distributed.
+%The Pearson coefficient of the array of drawn numbers is 0.004540536571419162.
+\lstinputlisting{randomnumbergenerator.py}
+
+
+\begin{figure}[h!]\label{fig:rngtest}
+  \centering
+  \includegraphics[width=0.5\linewidth]{./plots/rngtest.png}
+  \caption{Histogram of 10000 points drawn with \texttt{RandomNumberGenerator.random\_float()}.
+  }
+\end{figure}
+
+
+\subsection{Computing $A$ (question 1a)}
 %# Write a numerical integrator based on some form of Richardson extrapolation to 
 %# solve equation (2) for A given those four parameters. Output A to full precision.
 %# Hint: First think about what dV is for a spherical integral!
 We are given the number density profile
-\begin{equation}\label{eqn:one}
+\begin{equation}\label{eqn:numberdensity}
 n(x) = A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
 \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
 \end{equation}
 with $a = 2.4$, $b = 0.25$, $c = 1.6$, $x_\mathrm{max} = 5$ and $\langle N_\mathrm{sat}\rangle = 100$, and we want to know $A$.
+The parameter $x$ is the radius relative to the virial radius, $x \equiv r/r_\mathrm{vir}$.
 
 For a spherical integral, $\mathrm{d}V = x^2 \sin{\theta} \,\mathrm{d}x \mathrm{d}\theta \mathrm{d}\phi$. When integrating over a full sphere, this simplifies to $4\pi x^2 \,\mathrm{d}x$, so
-\begin{equation}\label{eqn:two}
+\begin{equation}\label{eqn:Nsat}
 \begin{split}
 \langle N_{sat} \rangle & = \int\int\int_V n(x) \,\mathrm{d}V \\
 & = 4\pi \int_{x=0}^{x=5} n(x) x^2 \,\mathrm{d}x.
 \end{split}
 \end{equation}
-Combining Equation \ref{eqn:one} and Equation \ref{eqn:two}, the equation to integrate becomes:
+Combining Equation \ref{eqn:numberdensity} and Equation \ref{eqn:Nsat}, the equation to integrate becomes:
 \begin{equation}
 \begin{split}
 \frac1A 
@@ -29,24 +48,26 @@ Combining Equation \ref{eqn:one} and Equation \ref{eqn:two}, the equation to int
 x^2 \,\mathrm{d}x.
 \end{split}
 \end{equation}
+
+All this is implemented in the following script:
+\lstinputlisting{question1a.py}
+
 The computed value of $A$ is:
 \lstinputlisting{question1a_output.txt}
 
-\subsection{[ding met rng]}
+\subsection{Sampling galaxies (question 1b)}
 %# We want to generate 3D satellite positions such that they statistically 
 %# follow the satellite profile in equation (1); 
 %# that is, the probability distribution of the (relative)
 %# radii x in [0, 5) should be p(x) dx = N (x) dx/ hN sat i.
 %# Use one of the methods discussed in class to sample this distribution.
 
-[[generate 3D satellite positions such that they statistically follow the satellite profile in equation (1); that is, the probability distribution of the (relative) radii in $x \in [0,5)$ should be p(x) dx = N (x) dx/ hN sat i.]]
+%[[generate 3D satellite positions such that they statistically follow the satellite profile in equation \ref{eqn:numberdensity}; that is, the probability distribution of the (relative) radii in $x \in [0,5)$ should be p(x) dx = N (x) dx/ hN sat i.]]
 
-$x \in [0,5)$
-
-$p(x) \mathrm{d}x = N(x) \mathrm{d}x / \langle N_\mathrm{sat} \rangle$
-
+We now want to generate 3D satellite positions that follow the number density in Equation \ref{eqn:numberdensity}, which means the radii $x$ should be distributed as
+$p(x) \mathrm{d}x = N(x) \mathrm{d}x / \langle N_\mathrm{sat} \rangle$.
+%$x \in [0,5)$
 %$N(x)\mathrm{d}x$ is the number of galaxies in range $[x,x+\mathrm{d}x)$.
-
 The number of galaxies in range $[x,x+\mathrm{d}x)$ is
 \begin{equation}
 \begin{split}
@@ -60,29 +81,33 @@ N(x) & = 4\pi x^2 n(x)
 \end{split}
 \end{equation}
 
-the distribution to sample from is
-\begin{equation}
+Combining this, the distribution to sample from is
+\begin{equation}\label{eqn:sampling_distr}
 \begin{split}
-p(x) \mathrm{d}x &= 4\pi x^2 n(x) / \langle N_\mathrm{sat} \rangle
+p(x) \mathrm{d}x &= 4\pi x^2 n(x) / \langle N_\mathrm{sat} \rangle.
 \end{split}
 \end{equation}
 
 %[[[ transformation kan niet zomaar want N(x) is niet invertible ]]]
-[[use rejection sampling]]
+Because we don't know the inverse of the distribution, rejection sampling is a good option. 
 
-[[iets over de rng]][[test randomness of rng]]
+The sampled galaxies, along with the analytical distribution function (Equation \ref{eqn:sampling_distr}) are plotted in Figure \ref{fig:question1b}.
 
 \begin{figure}[h!]\label{fig:question1b}
   \centering
   \includegraphics[width=0.9\linewidth]{./plots/question1b.png}
   \caption{
-  [[[caption]]]
+  The number of galaxies at a given relative radius.
+  The red line is the analytical distribution, according to
+  Equation \ref{eqn:sampling_distr}.
+  The histogram represents 10000 galaxies randomly drawn from Equation \ref{eqn:sampling_distr} with rejection sampling.
   }
 \end{figure}
 
+\lstinputlisting{question1b.py}
 
 
-\subsection{[selecting galaxies]}
+\subsection{Cumulative distribution function (question 1c)}
 %#Select 100 random satellite galaxies from (b) in a way that is guaranteed to:
 %# 1. select every galaxy with equal probability;
 %# 2. not draw the same galaxy twice;
@@ -90,29 +115,34 @@ p(x) \mathrm{d}x &= 4\pi x^2 n(x) / \langle N_\mathrm{sat} \rangle
 %# Next sort the 100 drawn galaxies from smallest to largest radius
 %# plot the number of galaxies within a radius, use a xlog plot from x = 10 -4 to x = x max .
 
-\begin{figure}[h!]\label{fig:question1c}
+From the 10000 generated galaxies, 100 are randomly selected.
+Generate a random integer between 0 and the remaining number of unselected galaxies. 
+Select the galaxy at that index, and remove it from the pool so it can't be selected again. 
+
+To plot their distribution as a cdf, the selected galaxies need to be sorted first (\texttt{selectionsort()}). The cdf can be seen in Figure \ref{fig:cdf}.
+
+\begin{figure}[h!]\label{fig:cdf}
   \centering
   \includegraphics[width=0.9\linewidth]{./plots/question1c.png}
   \caption{
-  [[[caption]]]
+  The number of galaxies situated within a relative radius $x$.
   }
 \end{figure}
 
-\subsection{[derivative]}
+%[[All this is implemented in the following script:]]
+\lstinputlisting{question1c.py}
+
+
+
+
+\subsection{Differentiation (question 1d)}
 %# Numerically calculate dn(x)/dx at x = 1.
 %# Output the value found alongside the analytical result, both to at least 12 significant digits. 
 %# Choose your differentiation algorithm such that these are as close as possible.
 
-\begin{equation}
-\begin{split}
-n(x) & = A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
-\exp{\left[ -\left(\frac{x}{b}\right)^c \right]} \\
-& = A \langle N_{sat} \rangle 
-f(x) g(x)
-\end{split}
-\end{equation}
+We want to know $\frac{\mathrm{d}n(x)}{\mathrm{d}x}$ at $x=1$. 
 
-
+For the analytical derivative, use the product rule:
 \begin{equation}
 \begin{split}
 \frac{\mathrm{d}n(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x} A \langle N_{sat} \rangle \left( \frac{x}{b} \right)^{a-3}
@@ -128,7 +158,7 @@ f(x) g(x) \\
 \begin{equation}
 \begin{split}
 \frac{\mathrm{d}f(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x}  \left( \frac{x}{b} \right)^{a-3} \\
-& = b^{3-a} (a-3) x^{a-4} \\
+%& = b^{3-a} (a-3) x^{a-4} \\
 & = (a-3) \left( \frac{x}{b} \right)^{a-3} x^{-1} \\
 & = f(x) (a-3) x^{-1}
 \end{split}
@@ -138,41 +168,18 @@ f(x) g(x) \\
 \begin{split}
 \frac{\mathrm{d}g(x)}{\mathrm{d}x} & = \frac{\mathrm{d}}{\mathrm{d}x} 
 \exp{\left[ -\left(\frac{x}{b}\right)^c \right]} \\
-& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot \frac{\mathrm{d}}{\mathrm{d}x} 
-\left[ -\left(\frac{x}{b}\right)^c \right] \\
-& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot 
--b^{-c} c x^{c-1} \\
-& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot 
-- \left(\frac{x}{b}\right)^c  c x^{-1} \\
-& = g(x)  \cdot 
-- \left(\frac{x}{b}\right)^c  c x^{-1} \\
+%& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot \frac{\mathrm{d}}{\mathrm{d}x} 
+%\left[ -\left(\frac{x}{b}\right)^c \right] \\
+%& = \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}  \cdot 
+%-b^{-c} c x^{c-1} \\
+& = - \left(\frac{x}{b}\right)^c  c x^{-1}
+ \exp{\left[ -\left(\frac{x}{b}\right)^c \right]}
+ \\
+& = - \left(\frac{x}{b}\right)^c  c x^{-1} g(x) \\
 \end{split}
 \end{equation}
 
-Combine into product rule:
-\begin{equation}
-\begin{split}
-\frac{\mathrm{d}f(x)}{\mathrm{d}x} g(x) + f(x) \frac{\mathrm{d}g(x)}{\mathrm{d}x} 
-& = 
-f(x) g(x) (a-3) x^{-1} 
-+ 
-f(x) g(x)  \cdot - \left(\frac{x}{b}\right)^c  c x^{-1} \\
-& =
-f(x) g(x)
-\left[
-(a-3) x^{-1}
-- \left(\frac{x}{b}\right)^c  c x^{-1}
-\right] \\
-& =
-f(x) g(x)
-\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1}
-\\
-\end{split}
-\end{equation}
-
-
-
-So
+Combine to get the derivative, conveniently in terms of $n(x)$:
 \begin{equation}
 \begin{split}
 \frac{\mathrm{d}n(x)}{\mathrm{d}x} & = 
@@ -180,17 +187,16 @@ A \langle N_{sat} \rangle
 f(x) g(x)
 \left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1} \\
 & = n(x)
-\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1}
+\left[ a-3 - c \left(\frac{x}{b}\right)^c  \right] x^{-1}.
 \end{split}
 \end{equation}
 
+The numerical derivative is found with Ridders' method. The numeric result is the closest to the analytical result when using a target accuracy of $10^{-10}$.
+
+%[[All this is implemented in the following script:]]
+\lstinputlisting{question1d.py}
 
 Output:
 \lstinputlisting{question1d_output.txt}
-
-
-\newpage
-All this is implemented in the following script:
-\lstinputlisting{question1.py}
 
 
